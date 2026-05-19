@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generador de bucles JavaScript</title>
+  <style>
+    :root {
+      --fondo: #f4f6f8;
+      --panel: #ffffff;
+      --texto: #1f2937;
+      --secundario: #6b7280;
+      --borde: #d1d5db;
+      --principal: #2563eb;
+      --principal-oscuro: #1d4ed8;
+      --codigo: #111827;
+      --codigo-texto: #e5e7eb;
+      --exito: #047857;
+      --aviso: #92400e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #eef2ff, var(--fondo));
+      color: var(--texto);
+      min-height: 100vh;
+      padding: 32px;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2.6rem;
+      color: #111827;
+    }
+
+    .subtitulo {
+      margin: 0;
+      color: var(--secundario);
+      font-size: 1rem;
+      max-width: 780px;
+    }
+
+    .panel-principal {
+      display: grid;
+      grid-template-columns: 1.8fr 0.8fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .tarjeta {
+      background: var(--panel);
+      border: 1px solid var(--borde);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      padding: 24px;
+    }
+
+    .cabecera-bucle {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .etiqueta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .descripcion {
+      color: var(--secundario);
+      margin: 0 0 16px;
+      line-height: 1.5;
+    }
+
+    pre {
+      margin: 0;
+      background: linear-gradient(145deg, #0f172a, #111827);
+      color: var(--codigo-texto);
+      padding: 34px;
+      border-radius: 22px;
+      overflow-x: auto;
+      font-size: 1.45rem;
+      line-height: 2;
+      border: 2px solid #374151;
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      box-shadow: inset 0 0 40px rgba(255,255,255,0.03), 0 14px 35px rgba(0,0,0,0.25);
+    }
+
+    code {
+      font-family: "Cascadia Code", Consolas, Monaco, "Courier New", monospace;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .botonera {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.14);
+    }
+
+    .principal {
+      background: var(--principal);
+      color: white;
+    }
+
+    .principal:hover {
+      background: var(--principal-oscuro);
+    }
+
+    .secundario {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .salida {
+      display: grid;
+      gap: 16px;
+    }
+
+    .bloque-salida {
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      padding: 16px;
+      background: #f9fafb;
+    }
+
+    .bloque-salida h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      color: #111827;
+    }
+
+    .bloque-salida p {
+      margin: 0;
+      color: var(--secundario);
+      line-height: 1.5;
+    }
+
+    .resultado-final {
+      color: var(--exito) !important;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .estado-variable {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .estado-variable:last-child {
+      border-bottom: none;
+    }
+
+    .nombre-variable {
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .valor-variable {
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      color: #111827;
+      font-weight: 700;
+    }
+
+    .resaltar-acumulador {
+      color: #facc15 !important;
+      font-weight: 900;
+      font-size: 1.55rem;
+      text-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
+      background: rgba(250, 204, 21, 0.08);
+      padding: 2px 4px;
+      border-radius: 6px;
+    }
+
+    .resaltar-contador {
+      color: #38bdf8 !important;
+      font-weight: 900;
+      font-size: 1.55rem;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+      background: rgba(56, 189, 248, 0.08);
+      padding: 2px 4px;
+      border-radius: 6px;
+    }
+
+    .resaltar-condicion {
+      color: #f87171 !important;
+      font-weight: 900;
+      font-size: 1.45rem;
+      text-shadow: 0 0 10px rgba(248, 113, 113, 0.6);
+      background: rgba(248, 113, 113, 0.08);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .modo-adivinacion {
+      margin-top: 18px;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid var(--borde);
+      background: #f9fafb;
+      display: none;
+      gap: 14px;
+    }
+
+    .modo-adivinacion.activo {
+      display: grid;
+    }
+
+    .campo-adivinacion {
+      display: grid;
+      gap: 6px;
+    }
+
+    .campo-adivinacion label {
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .campo-adivinacion input {
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+    }
+
+    .mensaje-adivinacion {
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .acierto {
+      color: var(--exito);
+    }
+
+    .fallo {
+      color: #b91c1c;
+    }
+
+    .nota {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--aviso);
+      background: #fffbeb;
+      color: #78350f;
+      border-radius: 10px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 850px) {
+      body {
+        padding: 18px;
+      }
+
+      .panel-principal {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <header>
+      <h1>Generador de bucles en JavaScript</h1>
+      <p class="subtitulo">
+        Aplicación educativa para observar cómo evolucionan un contador y un acumulador dentro de bucles sencillos.
+      </p>
+    </header>
+
+    <main class="panel-principal">
+      <section class="tarjeta">
+        <div class="cabecera-bucle">
+          <span class="etiqueta" id="tipoBucle">Bucle</span>
+        </div>
+
+        <p class="descripcion" id="descripcionBucle"></p>
+
+        <pre><code id="codigoBucle"></code></pre>
+
+        <div class="botonera" id="botoneraNormal">
+          <button class="principal" onclick="generarNuevoBucle()">Generar otro bucle</button>
+          <button class="principal" onclick="activarModoAdivinacion()">Modo adivinación</button>
+          <button class="secundario" onclick="mostrarIteraciones()">Mostrar iteraciones</button>
+          <button class="secundario" onclick="mostrarEstadoFinal()">Mostrar estado final de variables</button>
+          <button class="secundario" onclick="mostrarResultadoFinal()">Mostrar resultado final</button>
+          <button class="secundario" onclick="resaltarAcumulador()">Resaltar acumulador</button>
+          <button class="secundario" onclick="resaltarContador()">Resaltar contador</button>
+          <button class="secundario" onclick="resaltarCondicion()">Resaltar condición</button>
+        </div>
+
+        <div class="modo-adivinacion" id="panelAdivinacion">
+          <div class="campo-adivinacion">
+            <label for="respuestaResultado">Resultado final esperado</label>
+            <input type="number" id="respuestaResultado" placeholder="Escribe el valor final de suma" />
+          </div>
+
+          <div class="campo-adivinacion">
+            <label for="respuestaIteraciones">Número de iteraciones</label>
+            <input type="number" id="respuestaIteraciones" placeholder="Escribe cuántas vueltas dará el bucle" />
+          </div>
+
+          <div class="botonera">
+            <button class="principal" onclick="comprobarAdivinacion()">Comprobar respuesta</button>
+            <button class="secundario" onclick="volverModoNormal()">Volver al modo normal</button>
+          </div>
+
+          <p class="mensaje-adivinacion" id="mensajeAdivinacion"></p>
+        </div>
+
+        <div class="nota">
+          El código generado no se ejecuta con <code>eval</code>. La aplicación calcula internamente el resultado para evitar riesgos y facilitar su uso didáctico.
+        </div>
+      </section>
+
+      <aside class="tarjeta salida">
+        <div class="bloque-salida">
+          <h2>Iteraciones del bucle</h2>
+          <div id="iteracionesBucle">
+            <p>Pulsa el botón correspondiente para mostrar las iteraciones.</p>
+          </div>
+        </div>
+
+        <div class="bloque-salida">
+          <h2>Estado final de variables</h2>
+          <div id="estadoFinal">
+            <p>Pulsa el botón correspondiente para mostrar el estado final.</p>
+          </div>
+        </div>
+
+        <div class="bloque-salida">
+          <h2>Resultado final</h2>
+          <p id="resultadoFinal">Pulsa el botón correspondiente para mostrar el resultado.</p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    let bucleActual = null;
+
+    function aleatorio(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function elegir(lista) {
+      return lista[aleatorio(0, lista.length - 1)];
+    }
+
+    function crearDatosBase() {
+      const inicio = aleatorio(0, 3);
+      const limite = aleatorio(5, 10);
+      const acumuladorInicial = aleatorio(0, 5);
+      const incrementoContador = elegir([1, 1, 1, 2]);
+      const valorSumado = elegir(["i", "i * 2", "i + 1", "3"]);
+
+      return {
+        inicio,
+        limite,
+        acumuladorInicial,
+        incrementoContador,
+        valorSumado
+      };
+    }
+
+    function calcularValorSumado(expresion, i) {
+      if (expresion === "i") return i;
+      if (expresion === "i * 2") return i * 2;
+      if (expresion === "i + 1") return i + 1;
+      if (expresion === "3") return 3;
+      return 0;
+    }
+
+    function simularBucle(datos) {
+      let i = datos.inicio;
+      let suma = datos.acumuladorInicial;
+      let vueltas = 0;
+      let iteraciones = [];
+
+      while (i <= datos.limite) {
+        const valorAnterior = suma;
+        const incremento = calcularValorSumado(datos.valorSumado, i);
+
+        suma += incremento;
+
+        iteraciones.push({
+          contador: i,
+          sumaAnterior: valorAnterior,
+          incremento,
+          sumaNueva: suma
+        });
+
+        i += datos.incrementoContador;
+        vueltas++;
+      }
+
+      return { i, suma, vueltas, iteraciones };
+    }
+
+    function construirCodigoWhile(datos) {
+      return `let i = ${datos.inicio};
+let suma = ${datos.acumuladorInicial};
+
+while (i <= ${datos.limite}) {
+  suma = suma + ${datos.valorSumado};
+  i = i + ${datos.incrementoContador};
+}
+
+console.log("Resultado final: " + suma);`;
+    }
+
+    function construirCodigoDoWhile(datos) {
+      return `let i = ${datos.inicio};
+let suma = ${datos.acumuladorInicial};
+
+do {
+  suma = suma + ${datos.valorSumado};
+  i = i + ${datos.incrementoContador};
+} while (i <= ${datos.limite});
+
+console.log("Resultado final: " + suma);`;
+    }
+
+    function construirCodigoFor(datos) {
+      return `let suma = ${datos.acumuladorInicial};
+
+for (let i = ${datos.inicio}; i <= ${datos.limite}; i = i + ${datos.incrementoContador}) {
+  suma = suma + ${datos.valorSumado};
+}
+
+console.log("Resultado final: " + suma);`;
+    }
+
+    function crearBucle() {
+      const tipo = elegir(["while", "do...while", "for"]);
+      const datos = crearDatosBase();
+      const simulacion = simularBucle(datos);
+
+      let codigo = "";
+      let descripcion = "";
+
+      if (tipo === "while") {
+        codigo = construirCodigoWhile(datos);
+        descripcion = "En este ejemplo, la condición se comprueba antes de cada vuelta del bucle.";
+      } else if (tipo === "do...while") {
+        codigo = construirCodigoDoWhile(datos);
+        descripcion = "En este ejemplo, el bloque se ejecuta al menos una vez y después se comprueba la condición.";
+      } else {
+        codigo = construirCodigoFor(datos);
+        descripcion = "En este ejemplo, la inicialización, la condición y la actualización del contador aparecen en la cabecera del bucle.";
+      }
+
+      return {
+        tipo,
+        datos,
+        simulacion,
+        codigo,
+        descripcion
+      };
+    }
+
+    function generarNuevoBucle() {
+      bucleActual = crearBucle();
+
+      document.getElementById("tipoBucle").textContent = bucleActual.tipo;
+      document.getElementById("descripcionBucle").textContent = bucleActual.descripcion;
+      document.getElementById("codigoBucle").textContent = bucleActual.codigo;
+
+      document.getElementById("iteracionesBucle").innerHTML = "<p>Pulsa el botón correspondiente para mostrar las iteraciones.</p>";
+      document.getElementById("estadoFinal").innerHTML = "<p>Pulsa el botón correspondiente para mostrar el estado final.</p>";
+      document.getElementById("resultadoFinal").textContent = "Pulsa el botón correspondiente para mostrar el resultado.";
+      document.getElementById("resultadoFinal").className = "";
+    }
+
+    function activarModoAdivinacion() {
+      if (!bucleActual) return;
+
+      document.getElementById("botoneraNormal").style.display = "none";
+      document.getElementById("panelAdivinacion").classList.add("activo");
+      document.getElementById("iteracionesBucle").innerHTML = "<p>En modo adivinación, las iteraciones permanecen ocultas.</p>";
+      document.getElementById("estadoFinal").innerHTML = "<p>En modo adivinación, el estado final permanece oculto.</p>";
+      document.getElementById("resultadoFinal").textContent = "En modo adivinación, el resultado permanece oculto.";
+      document.getElementById("resultadoFinal").className = "";
+      document.getElementById("respuestaResultado").value = "";
+      document.getElementById("respuestaIteraciones").value = "";
+      document.getElementById("mensajeAdivinacion").textContent = "";
+    }
+
+    function volverModoNormal() {
+      document.getElementById("botoneraNormal").style.display = "flex";
+      document.getElementById("panelAdivinacion").classList.remove("activo");
+      document.getElementById("iteracionesBucle").innerHTML = "<p>Pulsa el botón correspondiente para mostrar las iteraciones.</p>";
+      document.getElementById("estadoFinal").innerHTML = "<p>Pulsa el botón correspondiente para mostrar el estado final.</p>";
+      document.getElementById("resultadoFinal").textContent = "Pulsa el botón correspondiente para mostrar el resultado.";
+      document.getElementById("resultadoFinal").className = "";
+    }
+
+    function comprobarAdivinacion() {
+      if (!bucleActual) return;
+
+      const respuestaResultado = Number(document.getElementById("respuestaResultado").value);
+      const respuestaIteraciones = Number(document.getElementById("respuestaIteraciones").value);
+      const resultadoCorrecto = bucleActual.simulacion.suma;
+      const iteracionesCorrectas = bucleActual.simulacion.vueltas;
+      const mensaje = document.getElementById("mensajeAdivinacion");
+
+      if (respuestaResultado === resultadoCorrecto && respuestaIteraciones === iteracionesCorrectas) {
+        mensaje.textContent = "Correcto. Has acertado el resultado final y el número de iteraciones.";
+        mensaje.className = "mensaje-adivinacion acierto";
+      } else {
+        mensaje.textContent = "No es correcto. Revisa el contador, la condición y cómo cambia el acumulador.";
+        mensaje.className = "mensaje-adivinacion fallo";
+      }
+    }
+
+    function mostrarIteraciones() {
+      if (!bucleActual) return;
+
+      const iteraciones = bucleActual.simulacion.iteraciones;
+
+      let html = "";
+
+      iteraciones.forEach((it, indice) => {
+        html += `
+          <div class="estado-variable">
+            <span class="nombre-variable">
+              Iteración ${indice + 1}: i = ${it.contador}
+            </span>
+            <span class="valor-variable">
+              suma: ${it.sumaAnterior} → ${it.sumaNueva}
+            </span>
+          </div>
+        `;
+      });
+
+      document.getElementById("iteracionesBucle").innerHTML = html;
+    }
+
+    function mostrarEstadoFinal() {
+      if (!bucleActual) return;
+
+      const estado = bucleActual.simulacion;
+      const html = `
+        <div class="estado-variable">
+          <span class="nombre-variable">Contador final</span>
+          <span class="valor-variable">i = ${estado.i}</span>
+        </div>
+        <div class="estado-variable">
+          <span class="nombre-variable">Acumulador final</span>
+          <span class="valor-variable">suma = ${estado.suma}</span>
+        </div>
+        <div class="estado-variable">
+          <span class="nombre-variable">Número de vueltas</span>
+          <span class="valor-variable">${estado.vueltas}</span>
+        </div>
+      `;
+
+      document.getElementById("estadoFinal").innerHTML = html;
+    }
+
+    function restaurarCodigoOriginal() {
+      document.getElementById("codigoBucle").textContent = bucleActual.codigo;
+    }
+
+    function resaltarAcumulador() {
+      if (!bucleActual) return;
+
+      restaurarCodigoOriginal();
+
+      let codigo = bucleActual.codigo;
+
+      codigo = codigo.replaceAll(
+        "suma",
+        '<span class="resaltar-acumulador">suma</span>'
+      );
+
+      document.getElementById("codigoBucle").innerHTML = codigo;
+    }
+
+    function resaltarContador() {
+      if (!bucleActual) return;
+
+      restaurarCodigoOriginal();
+
+      let codigo = bucleActual.codigo;
+
+      codigo = codigo.replaceAll(
+        "i",
+        '<span class="resaltar-contador">i</span>'
+      );
+
+      document.getElementById("codigoBucle").innerHTML = codigo;
+    }
+
+    function resaltarCondicion() {
+      if (!bucleActual) return;
+
+      restaurarCodigoOriginal();
+
+      let codigo = bucleActual.codigo;
+
+      codigo = codigo.replace(/i <= \d+/g,
+        '<span class="resaltar-condicion">$&</span>'
+      );
+
+      document.getElementById("codigoBucle").innerHTML = codigo;
+    }
+
+    function mostrarResultadoFinal() {
+      if (!bucleActual) return;
+
+      const resultado = document.getElementById("resultadoFinal");
+      resultado.textContent = "Resultado final mostrado por pantalla: " + bucleActual.simulacion.suma;
+      resultado.className = "resultado-final";
+    }
+
+    generarNuevoBucle();
+  </script>
+</body>
+</html>
